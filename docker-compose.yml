@@ -1,0 +1,35 @@
+services:
+  frontend:
+    image: client:v1.0.2
+    build:
+      context: ./client
+      args:
+        API_HOST: backend
+        API_PORT: 8080
+        API_BASE: /api/saludo
+    container_name: exu2-cliente
+    ports:
+      - "5173:80"
+    networks:
+      - exu2-net
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    image: operations:v1.0.2
+    build:
+      context: ./server
+    environment:
+      SERVER_PORT: 8080
+    container_name: exu2-operaciones
+    ports:
+      - "8086:8080"
+    networks:
+      - exu2-net
+    restart: unless-stopped
+
+networks:
+  exu2-net:
+    driver: bridge
+
