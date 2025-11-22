@@ -1,11 +1,13 @@
-// Construir URL de la API desde variables de entorno o usar valores por defecto
-const API_HOST = import.meta.env.VITE_API_HOST || 'localhost';
-const API_PORT = import.meta.env.VITE_API_PORT || '8086';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || `http://${API_HOST}:${API_PORT}`;
+// Construir URL de la API
+// En desarrollo: usa localhost:8086
+// En producción (Docker): usa la misma URL del frontend (el proxy de Nginx manejará /api)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.DEV ? 'http://localhost:8086' : '');
 
 export const saludoApi = {
   saludar: async (request) => {
-    const response = await fetch(`${API_BASE_URL}/api/saludo/saludar`, {
+    const url = API_BASE_URL ? `${API_BASE_URL}/api/saludo/saludar` : '/api/saludo/saludar';
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

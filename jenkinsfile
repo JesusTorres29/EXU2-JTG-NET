@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Parando los servicios...') {
+            steps {
+                bat '''
+                    docker compose -p EXAMEN down || exit /b 0
+                '''
+            }
+        }
+
+        stage('Eliminando imágenes anteriores...') {
+            steps {
+                bat '''
+                    for /f "tokens=*" %%i in ('docker images --filter "reference=client:v1.0.2" -q') do (
+                        docker rmi -f %%i
+                    )
+                    for /f "tokens=*" %%i in ('docker images --filter "reference=operations:v1.0.2" -q') do (
+                        docker rmi -f %%i
+                    )
+                    if errorlevel 1 (
+                        echo No hay imagenes por eliminar
+                    ) else (
+                        echo Imagenes eliminadas correctamente
+                    )
+                '''
+            }
+        }
+
+        stage('Obteniendo actualización...') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Construyendo y desplegando servicios...') {
+            steps {
+                bat '''
+                    docker compose -p EXAMEN up --build -d
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline ejecutado con éxito'
+        }
+        failure {
+            echo 'Hubo un error al ejecutar el pipeline'
+        }
+        always {
+            echo 'Pipeline finalizado'
+        }
+    }
+}
+
