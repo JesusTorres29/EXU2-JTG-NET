@@ -5,7 +5,7 @@ pipeline {
         stage('Parando los servicios...') {
             steps {
                 bat '''
-                    docker compose -p EXAMEN down || exit /b 0
+                    docker compose -p exu2 down || exit /b 0
                 '''
             }
         }
@@ -37,7 +37,7 @@ pipeline {
         stage('Construyendo y desplegando servicios...') {
             steps {
                 bat '''
-                    docker compose -p EXAMEN up --build -d
+                    docker compose -p exu2 up --build -d
                 '''
             }
         }
